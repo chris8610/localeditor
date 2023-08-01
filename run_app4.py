@@ -55,7 +55,7 @@ if uploaded_file is not None:
         end_frame = int(end_time * fps)
 
         # Initialize the video writer
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*'x264')
         out = cv2.VideoWriter('output.mp4', fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
 
         # Read and write the frames
