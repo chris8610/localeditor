@@ -40,8 +40,8 @@ if uploaded_file is not None:
     total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
 
     # Ask the user to specify the start and end times for analysis
-    start_time = st.slider('Start time (seconds)', min_value=0, max_value=total_duration, value=0)
-    end_time = st.slider('End time (seconds)', min_value=0, max_value=total_duration, value=total_duration)
+    start_time = st.sidebar.slider('Start time (seconds)', min_value=0, max_value=total_duration, value=0)
+    end_time = st.sidebar.slider('End time (seconds)', min_value=0, max_value=total_duration, value=total_duration)
 
     # Make sure that the end time is after the start time
     if end_time <= start_time:
