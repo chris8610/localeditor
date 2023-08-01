@@ -26,7 +26,7 @@ def load_video(video_file):  # video_fileを読み込む関数
     return vf  
 
 # Streamlitのファイルアップローダを使用してユーザーに動画ファイルのアップロードを依頼
-uploaded_file = st.file_uploader("Upload a video", type=['mp4', 'mov', 'avi'])
+uploaded_file = st.sidebar.file_uploader("Upload a video", type=['mp4', 'mov', 'avi'])
 if uploaded_file is not None:
     # Save the uploaded video file to disk as we cannot manipulate it directly from the UploadedFile object
     with open('uploaded_video.mp4', 'wb') as out:
