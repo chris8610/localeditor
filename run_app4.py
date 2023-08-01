@@ -40,8 +40,8 @@ if uploaded_file is not None:
     total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
 
     # Ask the user to specify the start and end times for analysis
-    start_time = st.sidebar.slider('Start time (seconds)', min_value=0, max_value=total_duration, value=0)
-    end_time = st.sidebar.slider('End time (seconds)', min_value=0, max_value=total_duration, value=total_duration)
+    start_time = st.slider('Start time (seconds)', min_value=0, max_value=total_duration, value=0)
+    end_time = st.slider('End time (seconds)', min_value=0, max_value=total_duration, value=total_duration)
 
     # Make sure that the end time is after the start time
     if end_time <= start_time:
@@ -92,7 +92,7 @@ video_file = 'output.mp4'
 #     size = (frame_width, frame_height)
 
 #     # フレームを書き出す
-#     out = cv2.VideoWriter(temp_filename, cv2.VideoWriter_fourcc(*'mp4v'), fps, size)
+#     out = cv2.VideoWriter(temp_filename, cv2.VideoWriter_fourcc(*'avc1'), fps, size)
 
 #     for frame in frames:
 #         # OpenCVはBGR形式を期待しているため、色の順番をRGBからBGRに変換
@@ -145,7 +145,7 @@ if video_file is not None:
 
 
     # 出力動画の設定
-    # fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Be sure to use the lower case
+    # fourcc = cv2.VideoWriter_fourcc(*'avc1') # Be sure to use the lower case
     # out = cv2.VideoWriter('output.mp4', fourcc, video_fps, (video_width, video_hight))
 
     landmarks_list = []  # 各フレームで検出されたランドマークの座標を保存するリスト
