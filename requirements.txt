@@ -1,0 +1,8 @@
+opencv-python-headless==4.6.0.66
+matplotlib
+mediapipe
+numpy
+pandas
+scipy
+streamlit
+moviepy
