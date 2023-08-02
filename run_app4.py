@@ -40,35 +40,47 @@ if uploaded_file is not None:
     # Open the video file
     cap = cv2.VideoCapture(tfile.name)
 
-    # Get the total duration of the video in seconds
-    total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
-    size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+    # Check if video is opened successfully
+    if not cap.isOpened():
+        st.error("Could not open video file.")
+    else:
+        # Get video properties
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+        if fps == 0:
+            st.error("Could not determine FPS of the video.")
+            return
+        total_duration = int(total_frames / fps)
 
-    # Allow user to select start and end times
-    start_time = st.sidebar.slider("Start Time (seconds)", 0, total_duration, 0)
-    end_time = st.sidebar.slider("End Time (seconds)", 0, total_duration, min(10, total_duration))
-    end_time = min(end_time, start_time + 10)  # Ensure duration doesn't exceed 10 seconds
+        # Get the total duration of the video in seconds
+        total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
+        fps = int(cap.get(cv2.CAP_PROP_FPS))
+        size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-    # Set the starting frame
-    cap.set(cv2.CAP_PROP_POS_FRAMES, start_time * fps)
+        # Allow user to select start and end times
+        start_time = st.sidebar.slider("Start Time (seconds)", 0, total_duration, 0)
+        end_time = st.sidebar.slider("End Time (seconds)", 0, total_duration, min(10, total_duration))
+        end_time = min(end_time, start_time + 10)  # Ensure duration doesn't exceed 10 seconds
 
-    # Create video writer with appropriate codec
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter('output.mp4', fourcc, fps, size)
+        # Set the starting frame
+        cap.set(cv2.CAP_PROP_POS_FRAMES, start_time * fps)
 
-    # Read and write the selected frames
-    for _ in range((end_time - start_time) * fps):
-        ret, frame = cap.read()
-        if ret:
-            out.write(frame)
+        # Create video writer with appropriate codec
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter('output.mp4', fourcc, fps, size)
 
-    # Release resources
-    cap.release()
-    out.release()
+        # Read and write the selected frames
+        for _ in range((end_time - start_time) * fps):
+            ret, frame = cap.read()
+            if ret:
+                out.write(frame)
 
-    # Play the output video
-    st.video('output.mp4')
+        # Release resources
+        cap.release()
+        out.release()
+
+        # Play the output video
+        st.video('output.mp4')
 
 
 video_file = 'output.mp4'
