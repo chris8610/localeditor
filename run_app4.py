@@ -49,8 +49,8 @@ if uploaded_file is not None:
         fps = int(cap.get(cv2.CAP_PROP_FPS))
         if fps == 0:
             st.error("Could not determine FPS of the video.")
-            return
-        total_duration = int(total_frames / fps)
+        else:
+            total_duration = int(total_frames / fps)
 
         # Get the total duration of the video in seconds
         total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
