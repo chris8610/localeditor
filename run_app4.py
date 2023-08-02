@@ -7,6 +7,8 @@ import pandas as pd
 import tempfile
 from scipy.signal import argrelextrema
 from scipy.fftpack import fft, ifft
+from moviepy.editor import *
+from moviepy.editor import VideoFileClip
 
 mp_drawing = mp.solutions.drawing_utils  # 検出した特徴点を描画
 mp_drawing_styles = mp.solutions.drawing_styles  # 点や線の色、太さなどのスタイル
@@ -33,49 +35,40 @@ if uploaded_file is not None:
         out.write(uploaded_file.read())
     st.video('uploaded_video.mp4')
 
+    tfile = tempfile.NamedTemporaryFile(delete=False)
+    tfile.write(uploaded_file.read())
     # Open the video file
-    cap = cv2.VideoCapture('uploaded_video.mp4')
+    cap = cv2.VideoCapture(tfile.name)
 
     # Get the total duration of the video in seconds
     total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-    # Ask the user to specify the start and end times for analysis
-    start_time = st.slider('Start time (seconds)', min_value=0, max_value=total_duration, value=0)
-    end_time = st.slider('End time (seconds)', min_value=0, max_value=total_duration, value=total_duration)
+    # Allow user to select start and end times
+    start_time = st.sidebar.slider("Start Time (seconds)", 0, total_duration, 0)
+    end_time = st.sidebar.slider("End Time (seconds)", 0, total_duration, min(10, total_duration))
+    end_time = min(end_time, start_time + 10)  # Ensure duration doesn't exceed 10 seconds
 
-    # Make sure that the end time is after the start time
-    if end_time <= start_time:
-        st.error('The end time must be after the start time.')
-    else:
-        # Get the frame rate of the video
-        fps = cap.get(cv2.CAP_PROP_FPS)
+    # Set the starting frame
+    cap.set(cv2.CAP_PROP_POS_FRAMES, start_time * fps)
 
-        # Calculate the start and end frames
-        start_frame = int(start_time * fps)
-        end_frame = int(end_time * fps)
+    # Create video writer with appropriate codec
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter('output.mp4', fourcc, fps, size)
 
-        # Initialize the video writer
-        fourcc = cv2.VideoWriter_fourcc(*'avc1')
-        out = cv2.VideoWriter('output.mp4', fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
+    # Read and write the selected frames
+    for _ in range((end_time - start_time) * fps):
+        ret, frame = cap.read()
+        if ret:
+            out.write(frame)
 
-        # Read and write the frames
-        frame_number = 0
-        while cap.isOpened():
-            ret, frame = cap.read()
-            
-            if not ret:
-                break
+    # Release resources
+    cap.release()
+    out.release()
 
-            if start_frame <= frame_number < end_frame:
-                out.write(frame)
-
-            frame_number += 1
-
-        # Release the video file and the writer
-        cap.release()
-        out.release()
-
-        st.video('output.mp4')
+    # Play the output video
+    st.video('output.mp4')
 
 
 video_file = 'output.mp4'
