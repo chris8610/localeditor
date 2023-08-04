@@ -453,7 +453,7 @@ if uploaded_file is not None:
     end_time = st.sidebar.slider("切り取りたい動画の終了時間（秒）を選択してください", start_time, min(int(clip.duration), start_time + 10), start_time + 10)
 
     # OKボタン
-    if st.sidebar.button("OK"):
+    if st.sidebar.button("解析開始"):
         # 10秒間の部分を切り取る
         subclip = clip.subclip(start_time, end_time)
 
@@ -468,7 +468,7 @@ if uploaded_file is not None:
         # 解析関数を呼び出す
         analyze_video(temp_clip_path)
 
-    # 青い太文字でテキストを表示
-    st.markdown("<span style='font-weight: bold; color: blue;'>動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください</span>", unsafe_allow_html=True)
-    # 青い太文字でテキストを表示
-    st.markdown("<span style='font-weight: bold; color: blue;'>真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！</span>", unsafe_allow_html=True)
+        # 青い太文字でテキストを表示
+        st.markdown("<span style='font-weight: bold; color: blue;'>動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください</span>", unsafe_allow_html=True)
+        # 青い太文字でテキストを表示
+        st.markdown("<span style='font-weight: bold; color: blue;'>真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！</span>", unsafe_allow_html=True)
