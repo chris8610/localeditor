@@ -453,19 +453,21 @@ if uploaded_file is not None:
     # ユーザーに切り取りたい動画の終了時間を入力させる（最大10秒後）
     end_time = st.sidebar.slider("切り取りたい動画の終了時間（秒）を選択してください", start_time, min(int(clip.duration), start_time + 10), start_time + 10)
 
-    # 指定された範囲を切り取る
-    subclip = clip.subclip(start_time, end_time)
+    # OKボタン
+    if st.button("OK"):
+        # 10秒間の部分を切り取る
+        subclip = clip.subclip(start_time, end_time)
 
-    # 一時ファイルに保存
-    temp_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4").name
-    subclip.write_videofile(temp_file_path, codec="libx264")
+        # 一時ファイルに保存
+        temp_clip_path = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4").name
+        subclip.write_videofile(temp_clip_path, codec="libx264")
 
-    # Streamlitで再生
-    st.write('＜解析に使用する動画＞')
-    st.video(temp_file_path)
+        # Streamlitで再生
+        st.write('＜解析に使用する動画＞')
+        st.video(temp_clip_path)
 
-    # 切り取った動画を解析
-    analyze_video(temp_file_path)
+        # 解析関数を呼び出す
+        analyze_video(temp_clip_path)
 
 
     st.write('動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください')
