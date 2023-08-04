@@ -467,4 +467,6 @@ if uploaded_file is not None:
     # 切り取った動画を解析
     analyze_video(temp_file_path)
 
+
+st.write('動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください')
 st.write('真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！')
