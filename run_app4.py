@@ -1,4 +1,9 @@
 import streamlit as st
+
+st.title('ランニングフォーム診断AI')
+st.write('真下着地ができているか、動画から解析します！')
+st.write('動画をアップロード後、解析には30秒ほどかかります。')
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -12,105 +17,19 @@ from moviepy.editor import VideoFileClip
 
 mp_drawing = mp.solutions.drawing_utils  # 検出した特徴点を描画
 mp_drawing_styles = mp.solutions.drawing_styles  # 点や線の色、太さなどのスタイル
-mp_pose = mp.solutions.pose  # 人間の身体の姿勢を推定g
-st.title('ランニングフォーム診断AI')
-st.write('あなたのフォームを診断します')
-st.write('あなた1人を撮影したランニング動画をアップロードしてください')
-st.write('動画サイズは200MB以下、形式はMP4, MOV, AVI, MPEG4のいずれかでお願いします')
-
+mp_pose = mp.solutions.pose  # 人間の身体の姿勢を推定
 
 def load_video(video_file):  # video_fileを読み込む関数
-    tfile = tempfile.NamedTemporaryFile(delete=False) # tfileという一時ファイルを作成
-    tfile.write(video_file.read())  #video_fileからデータを読み込み、tfileに格納
-
-    # OpenCVで読み込むためにファイルパスを取得
-    vf = cv2.VideoCapture(tfile.name)  # 上記で作成したtfileのパス=tfile.nameを取得し、ビデオファイルを開く
-    return vf  
-
-# Streamlitのファイルアップローダを使用してユーザーに動画ファイルのアップロードを依頼
-uploaded_file = st.sidebar.file_uploader("Upload a video", type=['mp4', 'mov', 'avi'])
-if uploaded_file is not None:
-    # # Save the uploaded video file to disk as we cannot manipulate it directly from the UploadedFile object
-    # with open('uploaded_video.mp4', 'wb') as out:
-    #     out.write(uploaded_file.read())
-    # st.video('uploaded_video.mp4')
-
-    tfile = tempfile.NamedTemporaryFile(delete=False)
-    tfile.write(uploaded_file.read())
-    # Open the video file
-    cap = cv2.VideoCapture(tfile.name)
-
-    # Check if video is opened successfully
-    if not cap.isOpened():
-        st.error("Could not open video file.")
-    else:
-        # Get video properties
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        if fps == 0:
-            st.error("Could not determine FPS of the video.")
-        else:
-            total_duration = int(total_frames / fps)
-
-        # Get the total duration of the video in seconds
-        total_duration = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-
-        # Allow user to select start and end times
-        start_time = st.sidebar.slider("Start Time (seconds)", 0, total_duration, 0)
-        end_time = st.sidebar.slider("End Time (seconds)", 0, total_duration, min(10, total_duration))
-        end_time = min(end_time, start_time + 10)  # Ensure duration doesn't exceed 10 seconds
-
-        # Set the starting frame
-        cap.set(cv2.CAP_PROP_POS_FRAMES, start_time * fps)
-
-        # Create video writer with appropriate codec
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter('output.mp4', fourcc, fps, size)
-
-        # Read and write the selected frames
-        for _ in range((end_time - start_time) * fps):
-            ret, frame = cap.read()
-            if ret:
-                out.write(frame)
-
-        # Release resources
-        cap.release()
-        out.release()
-
-        # Play the output video
-        st.video('output.mp4')
-
-
-video_file = 'output.mp4'
+    tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")  # tfileという一時ファイルを作成
+    tfile.write(video_file.read())  # video_fileからデータを読み込み、tfileに格納
+    return tfile.name
 
 
 
-# def play_output_video(frames, fps):  # 与えたFrameとFPSからビデオを作成し再生する関数
-#     # mp4形式の一時ファイルを作成
-#     tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') 
-#     temp_filename = tfile.name
-
-#     # フレームサイズを取得
-#     frame_height, frame_width, _ = frames[0].shape
-#     size = (frame_width, frame_height)
-
-#     # フレームを書き出す
-#     out = cv2.VideoWriter(temp_filename, cv2.VideoWriter_fourcc(*'avc1'), fps, size)
-
-#     for frame in frames:
-#         # OpenCVはBGR形式を期待しているため、色の順番をRGBからBGRに変換
-#         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-#         out.write(frame_bgr)
-#     out.release()
-
-#     # 作成した動画を再生
-#     st.video(temp_filename, format='mp4')
-
-if video_file is not None:
+# 動画解析関数の定義
+def analyze_video(video_path):
     # 動画ファイルをロード
-    video_data = load_video(video_file)
+    video_data = cv2.VideoCapture(video_path)
 
     # 動画の情報を取得し、各フレームを読み込む
     video_width = int(video_data.get(cv2.CAP_PROP_FRAME_WIDTH))    
@@ -150,7 +69,7 @@ if video_file is not None:
 
 
     # 出力動画の設定
-    # fourcc = cv2.VideoWriter_fourcc(*'avc1') # Be sure to use the lower case
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Be sure to use the lower case
     # out = cv2.VideoWriter('output.mp4', fourcc, video_fps, (video_width, video_hight))
 
     landmarks_list = []  # 各フレームで検出されたランドマークの座標を保存するリスト
@@ -209,8 +128,6 @@ if video_file is not None:
     # 動画出力処理
     # play_output_video(video_data_array, video_fps)
 
-    import tempfile
-    from moviepy.editor import *
     # 一時ファイルを作成
     tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') 
     output_filename = tfile.name
@@ -510,3 +427,36 @@ if video_file is not None:
         st.write(f'右足の方が左足より {difference}％ 多く重心より前に着地してしまっているようです。')
     else:
         st.write('左足と右足の比率は同じです。')
+
+
+
+# Streamlitのファイルアップローダを使用してユーザーに動画ファイルのアップロードを依頼
+uploaded_file = st.sidebar.file_uploader("ランナー1人を「横から」撮影した動画ファイルをアップロードしてください", type=["mp4", "mov", "avi", "mpeg4"])
+
+if uploaded_file is not None:
+    temp_file_path = load_video(uploaded_file)
+    clip = VideoFileClip(temp_file_path)
+
+    # 元動画をStreamlitで再生
+    st.video(temp_file_path)
+    
+    # ユーザーに切り取りたい動画の開始時間を入力させる
+    st.sidebar.write('1度に解析できるのは10秒以内の動画となります。')
+    st.sidebar.write('解析したい部分の開始時間と終了時間を選択してください。')
+    start_time = st.sidebar.slider("解析したい動画の開始時間（秒）を選択してください", 0, int(clip.duration) - 10, 0)
+
+    # ユーザーに切り取りたい動画の終了時間を入力させる（最大10秒後）
+    end_time = st.sidebar.slider("切り取りたい動画の終了時間（秒）を選択してください", start_time, min(int(clip.duration), start_time + 10), start_time + 10)
+
+    # 指定された範囲を切り取る
+    subclip = clip.subclip(start_time, end_time)
+
+    # 一時ファイルに保存
+    temp_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4").name
+    subclip.write_videofile(temp_file_path, codec="libx264")
+
+    # Streamlitで再生
+    st.video(temp_file_path)
+
+    # 切り取った動画を解析
+    analyze_video(temp_file_path)
