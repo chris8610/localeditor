@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.title('ランニングフォーム診断AI')
-st.write('真下着地ができているか、動画から解析します！')
+st.write('マラソンに重要な「真下着地」ができているか、動画から解析します！')
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -417,8 +417,7 @@ def analyze_video(video_path):
 
     # 右かかとのGOODのフレームの割合を計算します
     right_good_ratio = round(right_good_count / len(right_heel_max_indices) * 100, 2)
-    st.write(f'{len(valid_max_indices_centroid)}歩のうち、全体では{good_ratio}％、')
-    st.write(f'そのうち、左足では {left_good_ratio}％、右足では {right_good_ratio}％で真下着地ができています。')
+    st.write(f'{len(valid_max_indices_centroid)}歩のうち、全体では{good_ratio}％、うち、左足では {left_good_ratio}％、右足では {right_good_ratio}％で真下着地ができています。')
 
     # 左足と右足の比率を比較
     if left_good_ratio < right_good_ratio:
@@ -454,7 +453,7 @@ if uploaded_file is not None:
     end_time = st.sidebar.slider("切り取りたい動画の終了時間（秒）を選択してください", start_time, min(int(clip.duration), start_time + 10), start_time + 10)
 
     # OKボタン
-    if st.button("OK"):
+    if st.sidebar.button("OK"):
         # 10秒間の部分を切り取る
         subclip = clip.subclip(start_time, end_time)
 
@@ -470,5 +469,5 @@ if uploaded_file is not None:
         analyze_video(temp_clip_path)
 
 
-    st.write('動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください')
-    st.write('真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！')
+    st.title('動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください')
+    st.title('真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！')
