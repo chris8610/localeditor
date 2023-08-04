@@ -2,7 +2,6 @@ import streamlit as st
 
 st.title('ランニングフォーム診断AI')
 st.write('真下着地ができているか、動画から解析します！')
-st.write('動画をアップロード後、解析には30秒ほどかかります。')
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -65,7 +64,8 @@ def analyze_video(video_path):
         st.write("ビデオファイルが壊れている、拡張子が違う、ビデオが重すぎるなどの原因が考えられます")
         st.write("読み取れた部分のみを使用し解析いたします。")
     else:
-        st.write("正しく動画が読み込まれました")
+        st.write("正しく動画が読み込まれました。")
+        st.write('30秒ほどお待ちください。')
 
 
     # 出力動画の設定
@@ -238,18 +238,18 @@ def analyze_video(video_path):
     # ax.set_ylabel('Position')
     # st.pyplot(fig)
 
-    # 両足の上下動可視化
-    fig, ax = plt.subplots()
-    separated_df['left_foot_y_avg'] = separated_df[['27_y', '29_y']].mean(axis=1)
-    separated_df['right_foot_y_avg'] = separated_df[['28_y', '30_y']].mean(axis=1)
-    # ax.figure(figsize=(10,6))
-    ax.plot(separated_df['left_foot_y_avg'], label='Left Foot')
-    ax.plot(separated_df['right_foot_y_avg'], label='Right Foot')
-    ax.set_title('Vertical Movement of Feet')
-    ax.set_xlabel('Frame')
-    ax.set_ylabel('Position')
-    ax.legend()
-    st.pyplot(fig)
+    # # 両足の上下動可視化
+    # fig, ax = plt.subplots()
+    # separated_df['left_foot_y_avg'] = separated_df[['27_y', '29_y']].mean(axis=1)
+    # separated_df['right_foot_y_avg'] = separated_df[['28_y', '30_y']].mean(axis=1)
+    # # ax.figure(figsize=(10,6))
+    # ax.plot(separated_df['left_foot_y_avg'], label='Left Foot')
+    # ax.plot(separated_df['right_foot_y_avg'], label='Right Foot')
+    # ax.set_title('Vertical Movement of Feet')
+    # ax.set_xlabel('Frame')
+    # ax.set_ylabel('Position')
+    # ax.legend()
+    # st.pyplot(fig)
 
 
 
@@ -288,6 +288,9 @@ def analyze_video(video_path):
     # Print the indices of the local maxima
     print(centroid_max_indices)
     print(f"Number of local maxima: {len(centroid_max_indices[0])}")
+
+    st.write('あなたの重心位置の動きをグラフにしました。')
+    st.write('赤点が、足が地面に設置したポイントを示しています')
 
     # Plot the data
     plt.figure(figsize=(12, 6))
@@ -371,7 +374,6 @@ def analyze_video(video_path):
     good_ratio = round(good_count / len(heel_max_indices) * 100, 2)
 
     st.write(f'あなたの歩数は {len(valid_max_indices_centroid)}歩です。')
-    st.write(f'{len(valid_max_indices_centroid)}歩のうち、{good_ratio}％で真下着地ができています！')
 
 
     # 初期化
@@ -415,16 +417,18 @@ def analyze_video(video_path):
 
     # 右かかとのGOODのフレームの割合を計算します
     right_good_ratio = round(right_good_count / len(right_heel_max_indices) * 100, 2)
-
-    st.write(f'左足は {left_good_ratio}％、右足は {right_good_ratio}％です！')
+    st.write(f'{len(valid_max_indices_centroid)}歩のうち、全体では{good_ratio}％、')
+    st.write(f'そのうち、左足では {left_good_ratio}％、右足では {right_good_ratio}％で真下着地ができています。')
 
     # 左足と右足の比率を比較
     if left_good_ratio < right_good_ratio:
         difference = round(right_good_ratio - left_good_ratio, 2)  # 差を計算
         st.write(f'左足の方が右足より {difference}％ 多く重心より前に着地してしまっているようです。')
+        st.write(f'まずは左足を右足と同じぐらいの位置に接地する意識を持って、走ってみてください。')
     elif right_good_ratio < left_good_ratio:
         difference = round(left_good_ratio - right_good_ratio, 2)  # 差を計算
         st.write(f'右足の方が左足より {difference}％ 多く重心より前に着地してしまっているようです。')
+        st.write(f'まずは右足を左足と同じぐらいの位置に接地する意識を持って、走ってみてください。')
     else:
         st.write('左足と右足の比率は同じです。')
 
@@ -438,6 +442,7 @@ if uploaded_file is not None:
     clip = VideoFileClip(temp_file_path)
 
     # 元動画をStreamlitで再生
+    st.write('＜アップロードされた元動画＞')
     st.video(temp_file_path)
     
     # ユーザーに切り取りたい動画の開始時間を入力させる
@@ -456,7 +461,10 @@ if uploaded_file is not None:
     subclip.write_videofile(temp_file_path, codec="libx264")
 
     # Streamlitで再生
+    st.write('＜解析に使用する動画＞')
     st.video(temp_file_path)
 
     # 切り取った動画を解析
     analyze_video(temp_file_path)
+
+st.write('真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！')
