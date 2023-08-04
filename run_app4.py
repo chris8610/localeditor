@@ -468,6 +468,7 @@ if uploaded_file is not None:
         # 解析関数を呼び出す
         analyze_video(temp_clip_path)
 
-
-    st.title('動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください')
-    st.title('真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！')
+    # 青い太文字でテキストを表示
+    st.markdown("<span style='font-weight: bold; color: blue;'>動画の切り取る部分によって、結果が変わることがあります。いろいろ試して遊んでみてください</span>", unsafe_allow_html=True)
+    # 青い太文字でテキストを表示
+    st.markdown("<span style='font-weight: bold; color: blue;'>真下着地ができれば走りがラクになります！一緒に頑張っていきましょう！</span>", unsafe_allow_html=True)
