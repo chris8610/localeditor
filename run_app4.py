@@ -418,7 +418,7 @@ def analyze_video(video_path):
 
     # 右かかとのGOODのフレームの割合を計算します
     right_good_ratio = round(right_good_count / len(right_heel_max_indices) * 100, 2)
-    st.write(f'{len(valid_max_indices_centroid)}歩のうち、真下着地できているのは{good_ratio}％（左足： {left_good_ratio}％、右足： {right_good_ratio}％です。')
+    st.write(f'{len(valid_max_indices_centroid)}歩のうち、真下着地できているのは{good_ratio}％（左足： {left_good_ratio}％、右足： {right_good_ratio}％）です。')
 
     # 左足と右足の比率を比較
     if left_good_ratio < right_good_ratio:
