@@ -151,6 +151,7 @@ def analyze_video(video_path):
     clip.write_videofile(output_filename2, codec='libx264')
 
     # Streamlitのvideoウィジェットで動画を再生する
+    st.write('<身体の各部位の位置を動画にプロットしました＞')
     st.video(output_filename2)
 
 
@@ -373,7 +374,7 @@ def analyze_video(video_path):
     # 全体のフレーム数に対するGOODのフレームの割合を計算します
     good_ratio = round(good_count / len(heel_max_indices) * 100, 2)
 
-    st.write(f'あなたの歩数は {len(valid_max_indices_centroid)}歩です。')
+    st.write(f'あなたの歩数： {len(valid_max_indices_centroid)}歩')
 
 
     # 初期化
@@ -417,7 +418,7 @@ def analyze_video(video_path):
 
     # 右かかとのGOODのフレームの割合を計算します
     right_good_ratio = round(right_good_count / len(right_heel_max_indices) * 100, 2)
-    st.write(f'{len(valid_max_indices_centroid)}歩のうち、全体では{good_ratio}％、うち、左足では {left_good_ratio}％、右足では {right_good_ratio}％で真下着地ができています。')
+    st.write(f'{len(valid_max_indices_centroid)}歩のうち、真下着地できているのは{good_ratio}％（左足： {left_good_ratio}％、右足： {right_good_ratio}％です。')
 
     # 左足と右足の比率を比較
     if left_good_ratio < right_good_ratio:
